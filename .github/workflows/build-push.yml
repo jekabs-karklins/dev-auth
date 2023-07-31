@@ -1,0 +1,29 @@
+name: Build and Push Image
+
+on:
+  pull_request: # change this when test is complete to "push"
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Create image tags
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/portchain/dev-auth
+          flavor: latest=true
+          tags: |
+            type=sha,format=long,prefix=
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
